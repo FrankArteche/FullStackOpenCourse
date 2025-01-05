@@ -1,17 +1,66 @@
 import { useState } from "react";
 
+const SearchField = ({ handleSearch, inputSearch }) => {
+  return (
+    <div>
+      filter shown with <input onChange={handleSearch} value={inputSearch} />
+    </div>
+  );
+};
+
+const Form = ({ addPerson, newName, handleInputChange }) => {
+  return (
+    <form onSubmit={addPerson}>
+      <div>
+        name:{" "}
+        <input
+          value={newName.name}
+          onChange={(e) => handleInputChange(e, "name")}
+        />
+      </div>
+      <div>
+        number:{" "}
+        <input
+          value={newName.number}
+          onChange={(e) => handleInputChange(e, "number")}
+        />
+      </div>
+      <div>
+        <button type="submit">add</button>
+      </div>
+    </form>
+  );
+};
+
+const Persons = ({ persons }) => {
+  return (
+    <>
+      <h2>Numbers</h2>
+      {persons.map((person) => {
+        return (
+          <>
+            <div key={person.id}>
+              <h4>
+                {person.name} {person.number}
+              </h4>
+            </div>
+          </>
+        );
+      })}
+    </>
+  );
+};
 const App = () => {
   const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456', id: 1 },
-    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
-  ])
+    { name: "Arto Hellas", number: "040-123456", id: 1 },
+    { name: "Ada Lovelace", number: "39-44-5323523", id: 2 },
+    { name: "Dan Abramov", number: "12-43-234345", id: 3 },
+    { name: "Mary Poppendieck", number: "39-23-6423122", id: 4 },
+  ]);
 
   const [newName, setNewName] = useState({ name: "", number: "" });
 
   const [inputSearch, setInputSearch] = useState("");
-
 
   const addPerson = (e) => {
     e.preventDefault();
@@ -68,52 +117,26 @@ const App = () => {
   };
 
   const handleSearch = (e) => {
-    setInputSearch(e.target.value)
+    setInputSearch(e.target.value);
 
     const filteredPersons = persons.filter((person) => {
-      return person.name.toLowerCase().includes(e.target.value.toLowerCase())
-    })
+      return person.name.toLowerCase().includes(e.target.value.toLowerCase());
+    });
 
-    setPersons(filteredPersons)
-  }
+    setPersons(filteredPersons);
+  };
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        filter shown with{" "}
-        <input onChange={handleSearch} value={inputSearch}/>
-      </div>
+      <SearchField handleSearch={handleSearch} inputSearch={inputSearch} />
       <h2>Add a new phone</h2>
-      <form onSubmit={addPerson}>
-        <div>
-          name:{" "}
-          <input
-            value={newName.name}
-            onChange={(e) => handleInputChange(e, "name")}
-          />
-        </div>
-        <div>
-          number:{" "}
-          <input
-            value={newName.number}
-            onChange={(e) => handleInputChange(e, "number")}
-          />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
-      <h2>Numbers</h2>
-      {persons.map((person) => {
-        return (
-          <>
-            <div key={person.id}>
-              <h4>{person.name} {person.number}</h4>
-            </div>
-          </>
-        );
-      })}
+      <Form
+        handleInputChange={handleInputChange}
+        addPerson={addPerson}
+        newName={newName}
+      />
+      <Persons persons={persons} />
     </div>
   );
 };
