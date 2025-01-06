@@ -33,7 +33,7 @@ const Form = ({ addPerson, newName, handleInputChange }) => {
   );
 };
 
-const Persons = ({ persons }) => {
+const Persons = ({ persons, handleDeletePerson }) => {
   return (
     <>
       <h2>Numbers</h2>
@@ -43,6 +43,7 @@ const Persons = ({ persons }) => {
             <h4>
               {person.name} {person.number}
             </h4>
+            <button onClick={(e) => handleDeletePerson(person)}>delete</button>
           </div>
         );
       })}
@@ -129,6 +130,16 @@ const App = () => {
     setPersons(filteredPersons);
   };
 
+  const handleDeletePerson = (personToDelete) => {
+    
+    if (window.confirm(`Do you really want to delete ${personToDelete.name}?`)) {
+      personService.deletePerson(personToDelete.id)
+    .then(response => {
+      setPersons(persons.filter(person => person.id !== personToDelete.id))
+    })
+    }
+  };
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -139,7 +150,7 @@ const App = () => {
         addPerson={addPerson}
         newName={newName}
       />
-      <Persons persons={persons} />
+      <Persons persons={persons} handleDeletePerson={handleDeletePerson}/>
     </div>
   );
 };
