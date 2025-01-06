@@ -22,10 +22,13 @@ function App() {
       country.name.common.toLowerCase().includes(search.toLowerCase())
     );
     console.log(countriesSearched);
-    
 
     setCountries(countriesSearched);
   };
+
+  const handleShowCountry = (event) => {
+    setCountries([countries.find((country)=> country.name.common === event.target.previousSibling.textContent)]);
+  }
 
   return (
     <>
@@ -34,11 +37,16 @@ function App() {
         {countries.length > 10 && (
           <p>Too many matches, specify another filter</p>
         )}
-        {countries.length <= 10 &&
-          countries.length > 1 &&
-          countries.map((country) => (
-            <p key={country.name.common}>{country.name.common}</p>
-          ))}
+        {countries.length <= 10 && countries.length > 1 && (
+          <>
+            {countries.map((country) => (
+              <div key={country.name.common}>
+                <p>{country.name.common}</p>
+                <button onClick={handleShowCountry}>show</button>
+              </div>
+            ))}
+          </>
+        )}
         {countries.length == 1 && (
           <div>
             <h1>{countries[0].name.common}</h1>
@@ -48,10 +56,9 @@ function App() {
             <ul>
               {Object.values(countries[0].languages).map((language) => (
                 <li key={language}>{language}</li>
-              ))} 
+              ))}
             </ul>
-            <img
-            src={countries[0].flags.png}></img>
+            <img src={countries[0].flags.png}></img>
           </div>
         )}
       </div>
