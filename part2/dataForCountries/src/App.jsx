@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import axios from "axios";
 
+const api_key = import.meta.env.weatherAPIKey
+
 function App() {
   const [countries, setCountries] = useState([]);
   const [search, setSearch] = useState("");
@@ -13,7 +15,18 @@ function App() {
       .then((response) => {
         setCountries(response.data);
       });
+
   }, []);
+
+  useEffect(() => {
+    if(countries.length === 1){
+      axios
+      .get(`https://api.openweathermap.org/data/3.0/onecall?lat=${countries[0].latlng[0]}&lon=${countries[0].latlng[1]}&appid=${api_key}`)
+      .then((response) => {
+        console.log(response.data);
+      });
+    }
+  }, [countries]);
 
   const handleSearch = (event) => {
     setSearch(event.target.value);
@@ -59,6 +72,9 @@ function App() {
               ))}
             </ul>
             <img src={countries[0].flags.png}></img>
+            <h2>Weather in {countries[0].capital[0]}</h2>
+            <p>temperature:</p>
+            <p>wind:</p>
           </div>
         )}
       </div>
