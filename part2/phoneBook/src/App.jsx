@@ -37,7 +37,7 @@ const Persons = ({ persons, handleDeletePerson }) => {
   return (
     <>
       <h2>Numbers</h2>
-      {persons.map((person) => {
+      {persons?.map((person) => {
         return (
           <div key={person.id}>
             <h4>
@@ -58,8 +58,8 @@ const App = () => {
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
-      setPersons(initialPersons)
-    })
+      setPersons(initialPersons);
+    });
   }, []);
 
   const addPerson = (e) => {
@@ -69,50 +69,22 @@ const App = () => {
       number: newName.number,
     };
 
-    let canAddPerson = persons.find((item) => {
-      return !areTheseObjectsEqual(item, personObject);
-    });
+    const existingPerson = persons.find(
+      (item) => item.name === personObject.name
+    );
 
-    if (!canAddPerson) {
-      alert(`${newName.name} is already added to phonebook`);
+    if (existingPerson) {
+      
+      handleUpdatePerson(existingPerson);
       return;
     }
 
-    personService.create(personObject)
-      .then((response) => {
-        setPersons(persons.concat(response.data));
-      });
+    personService.create(personObject).then((response) => {
+      setPersons(persons.concat(response.data));
+    });
 
     setNewName({ name: "", number: "" });
   };
-
-  function areTheseObjectsEqual(first, second) {
-    const al = Object.getOwnPropertyNames(first);
-    const bl = Object.getOwnPropertyNames(second);
-
-    // Check if the two list of keys are the same
-    // length. If they are not, we know the objects
-    // are not equal.
-    if (al.length !== bl.length) return false;
-
-    // Check that all keys from both objects match
-    // are present on both objects.
-    const hasAllKeys = al.every((value) => !!bl.find((v) => v === value));
-
-    // If not all the keys match, we know the
-    // objects are not equal.
-    if (!hasAllKeys) return false;
-
-    // We can now check that the value of each
-    // key matches its corresponding key in the
-    // other object.
-    for (const key of al) if (first[key] !== second[key]) return false;
-
-    // If the object hasn't return yet, at this
-    // point we know that the objects are the
-    // same
-    return true;
-  }
 
   const handleInputChange = (e, input) => {
     console.log(e, input);
@@ -131,12 +103,33 @@ const App = () => {
   };
 
   const handleDeletePerson = (personToDelete) => {
-    
-    if (window.confirm(`Do you really want to delete ${personToDelete.name}?`)) {
-      personService.deletePerson(personToDelete.id)
-    .then(response => {
-      setPersons(persons.filter(person => person.id !== personToDelete.id))
-    })
+    if (
+      window.confirm(`Do you really want to delete ${personToDelete.name}?`)
+    ) {
+      personService.deletePerson(personToDelete.id).then((response) => {
+        setPersons(persons.filter((person) => person.id !== personToDelete.id));
+      });
+    }
+  };
+
+  const handleUpdatePerson = (personToUpdate) => {
+    if (
+      window.confirm(
+        `${personToUpdate.name} is already added to phonebook, replace the old number with a new one?`
+      )
+    ) {
+      personService
+        .update(personToUpdate.id, {
+          ...personToUpdate,
+          number: newName.number,
+        })
+        .then((response) => {
+          setPersons(
+            persons.map((person) =>
+              person.id !== personToUpdate.id ? person : response
+            )
+          );
+        });
     }
   };
 
@@ -150,7 +143,7 @@ const App = () => {
         addPerson={addPerson}
         newName={newName}
       />
-      <Persons persons={persons} handleDeletePerson={handleDeletePerson}/>
+      <Persons persons={persons} handleDeletePerson={handleDeletePerson} />
     </div>
   );
 };
