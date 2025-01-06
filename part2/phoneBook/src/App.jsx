@@ -51,10 +51,20 @@ const Persons = ({ persons, handleDeletePerson }) => {
   );
 };
 
+const Notification = ({ message, showMessage }) => {
+  if (message === null) {
+    return null;
+  }
+
+  return <>{showMessage && <div className="message">{message}</div>}</>;
+};
+
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState({ name: "", number: "" });
   const [inputSearch, setInputSearch] = useState("");
+  const [message, setMessage] = useState("");
+  const [showMessage, setShowMessage] = useState(false);
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
@@ -74,13 +84,17 @@ const App = () => {
     );
 
     if (existingPerson) {
-      
       handleUpdatePerson(existingPerson);
       return;
     }
 
     personService.create(personObject).then((response) => {
-      setPersons(persons.concat(response.data));
+      setPersons(persons.concat(response));
+      setMessage(`Added ${response.name}`);
+      setShowMessage(true);
+      setTimeout(() => {
+        setShowMessage(false);
+      }, 3000);
     });
 
     setNewName({ name: "", number: "" });
@@ -129,15 +143,22 @@ const App = () => {
               person.id !== personToUpdate.id ? person : response
             )
           );
+          setMessage(`Updated ${response.name}`);
+          setShowMessage(true);
+          setTimeout(() => {
+            setShowMessage(false);
+          }, 3000);
         });
     }
   };
 
   return (
     <div>
-      <h2>Phonebook</h2>
+      <h1>Phonebook</h1>
+      <Notification message={message} showMessage={showMessage} />
+
       <SearchField handleSearch={handleSearch} inputSearch={inputSearch} />
-      <h2>Add a new phone</h2>
+      <h1>Add a new phone</h1>
       <Form
         handleInputChange={handleInputChange}
         addPerson={addPerson}
