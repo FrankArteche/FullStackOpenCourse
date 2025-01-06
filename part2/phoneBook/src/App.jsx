@@ -56,14 +56,22 @@ const Notification = ({ message, showMessage }) => {
     return null;
   }
 
-  return <>{showMessage && <div className="message">{message}</div>}</>;
+  return (
+    <>
+      {showMessage && message.type == "success" && <div className="successMessage">{message.content}</div>}
+      {showMessage && message.type == "error" && <div className="errorMessage">{message.content}</div>}
+    </>
+  );
 };
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState({ name: "", number: "" });
   const [inputSearch, setInputSearch] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState({
+    content: "",
+    type: "",
+  });
   const [showMessage, setShowMessage] = useState(false);
 
   useEffect(() => {
@@ -90,7 +98,11 @@ const App = () => {
 
     personService.create(personObject).then((response) => {
       setPersons(persons.concat(response));
-      setMessage(`Added ${response.name}`);
+      setMessage({
+        ...message,
+        content: `Added ${response.name}`,
+        type: "success",
+      });
       setShowMessage(true);
       setTimeout(() => {
         setShowMessage(false);
@@ -120,9 +132,24 @@ const App = () => {
     if (
       window.confirm(`Do you really want to delete ${personToDelete.name}?`)
     ) {
-      personService.deletePerson(personToDelete.id).then((response) => {
-        setPersons(persons.filter((person) => person.id !== personToDelete.id));
-      });
+      personService
+        .deletePerson(personToDelete.id)
+        .then((response) => {
+          setPersons(
+            persons.filter((person) => person.id !== personToDelete.id)
+          );
+        })
+        .catch((error) => {
+          setMessage({
+            ...message,
+            content: `Information of ${personToDelete.name} has already been removed from the server`,
+            type: "error",
+          });
+          setShowMessage(true);
+          setTimeout(() => {
+            setShowMessage(false);
+          }, 3000);
+        });
     }
   };
 
@@ -143,7 +170,11 @@ const App = () => {
               person.id !== personToUpdate.id ? person : response
             )
           );
-          setMessage(`Updated ${response.name}`);
+          setMessage({
+            ...message,
+            content: `Updated ${response.name}`,
+            type: "success",
+          });
           setShowMessage(true);
           setTimeout(() => {
             setShowMessage(false);
