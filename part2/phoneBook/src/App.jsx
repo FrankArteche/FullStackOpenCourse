@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import personService from "./services/persons";
 
 const SearchField = ({ handleSearch, inputSearch }) => {
   return (
@@ -56,9 +56,9 @@ const App = () => {
   const [inputSearch, setInputSearch] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      setPersons(response.data);
-    });
+    personService.getAll().then((initialPersons) => {
+      setPersons(initialPersons)
+    })
   }, []);
 
   const addPerson = (e) => {
@@ -77,8 +77,7 @@ const App = () => {
       return;
     }
 
-    axios
-      .post("http://localhost:3001/persons", personObject)
+    personService.create(personObject)
       .then((response) => {
         setPersons(persons.concat(response.data));
       });
