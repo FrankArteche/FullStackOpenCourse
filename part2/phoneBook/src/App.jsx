@@ -39,16 +39,17 @@ const Persons = ({ persons }) => {
       <h2>Numbers</h2>
       {persons.map((person) => {
         return (
-            <div key={person.id}>
-              <h4>
-                {person.name} {person.number}
-              </h4>
-            </div>
+          <div key={person.id}>
+            <h4>
+              {person.name} {person.number}
+            </h4>
+          </div>
         );
       })}
     </>
   );
 };
+
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState({ name: "", number: "" });
@@ -68,16 +69,21 @@ const App = () => {
     };
 
     let canAddPerson = persons.find((item) => {
-      return areTheseObjectsEqual(item, personObject);
+      return !areTheseObjectsEqual(item, personObject);
     });
 
-    if (canAddPerson) {
-      alert(`${newName} is already added to phonebook`);
+    if (!canAddPerson) {
+      alert(`${newName.name} is already added to phonebook`);
       return;
     }
 
-    setPersons(persons.concat(personObject));
-    setNewName("");
+    axios
+      .post("http://localhost:3001/persons", personObject)
+      .then((response) => {
+        setPersons(persons.concat(response.data));
+      });
+
+    setNewName({ name: "", number: "" });
   };
 
   function areTheseObjectsEqual(first, second) {
