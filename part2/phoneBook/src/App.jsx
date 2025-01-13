@@ -107,7 +107,14 @@ const App = () => {
       setTimeout(() => {
         setShowMessage(false);
       }, 3000);
-    });
+    }).catch((error) => {
+      console.log(error.response.data.error)
+      setMessage({
+        ...message,
+        content: `Validations failed`,
+        type: "error",
+      });
+    })
 
     setNewName({ name: "", number: "" });
   };
