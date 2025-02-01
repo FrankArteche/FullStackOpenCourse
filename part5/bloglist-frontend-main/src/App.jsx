@@ -10,6 +10,10 @@ const App = () => {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [newBlog, setNewBlog] = useState({});
+  const [notification, setNotification] = useState({
+    type: "",
+    message: "",
+  });
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -28,10 +32,16 @@ const App = () => {
       setUser(user);
       setUsername("");
       setPassword("");
-    } catch (exception) {
-      setErrorMessage("Wrong credentials");
+    } catch (error) {
+      setNotification({
+        type: "error",
+        message: `An error occurred:  ${error.response.data.error}`,
+      });
       setTimeout(() => {
-        setErrorMessage(null);
+        setNotification({
+          type: "",
+          message: "",
+        });
       }, 5000);
     }
   };
@@ -47,6 +57,13 @@ const App = () => {
   };
 
   const loginForm = () => (
+    <>
+    <h1>Login to application</h1>
+    {notification.message.length > 0 && (
+        <div className={notification.type == "success" ? "success" : "error"}>
+          {notification.message}
+        </div>
+      )}
     <form onSubmit={handleLogin}>
       <div>
         username
@@ -68,22 +85,35 @@ const App = () => {
       </div>
       <button type="submit">login</button>
     </form>
+    </>
+    
   );
 
   const handleLogout = () => {
-    window.localStorage.removeItem('loggedUser')
-    window.location.reload()
-  }
+    window.localStorage.removeItem("loggedUser");
+    window.location.reload();
+  };
 
   const blogsRenderer = () => (
     <>
       <h2>blogs</h2>
+      {notification.message.length > 0 && (
+        <div className={notification.type == "success" ? "success" : "error"}>
+          {notification.message}
+        </div>
+      )}
 
       <div>
         {user.username} logged in
         <button onClick={handleLogout}>logout</button>
       </div>
-      <CreateBlog setNewBlog={setNewBlog} newBlog={newBlog}/>
+      <CreateBlog
+        setNewBlog={setNewBlog}
+        newBlog={newBlog}
+        setNotification={setNotification}
+        setBlogs={setBlogs}
+        blogs={blogs}
+      />
       {blogs.map((blog) => (
         <Blog key={blog.id} blog={blog} />
       ))}
