@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
@@ -10,7 +10,6 @@ const App = () => {
   const [user, setUser] = useState(null);
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
-  const [newBlog, setNewBlog] = useState({});
   const [notification, setNotification] = useState({
     type: "",
     message: "",
@@ -20,8 +19,7 @@ const App = () => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
   }, []);
 
-  const blogFormRef = useRef()
-
+  const blogFormRef = useRef();
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -50,47 +48,69 @@ const App = () => {
     }
   };
 
-  const addBlog = (event) => {
-    event.preventDefault();
-    const blogObject = {};
+  const addBlog = async (blogObject) => {
+    blogFormRef.current.toggleVisibility();
 
-    blogService.create(blogObject).then((response) => {
-      setBlogs(blogs.concat(response));
-      setNewBlog("");
-    });
+    try {
+      await blogService.create(blogObject).then((response) => {
+        setBlogs(blogs.concat(response));
+      });
+      setNotification({
+        type: "success",
+        message: `A new Blog called ${blogObject.title} by ${blogObject.author} has been added`,
+      });
+      setTimeout(() => {
+        setNotification({
+          type: "",
+          message: "",
+        });
+      }, 5000);
+    } catch (error) {
+      console.log(error);
+      
+      setNotification({
+        type: "error",
+        message: `An error occurred:  ${error.response.data.error}`,
+      });
+      setTimeout(() => {
+        setNotification({
+          type: "",
+          message: "",
+        });
+      }, 5000);
+    }
   };
 
   const loginForm = () => (
     <>
-    <h1>Login to application</h1>
-    {notification.message.length > 0 && (
+      <h1>Login to application</h1>
+      {notification.message.length > 0 && (
         <div className={notification.type == "success" ? "success" : "error"}>
           {notification.message}
         </div>
       )}
-    <form onSubmit={handleLogin}>
-      <div>
-        username
-        <input
-          type="text"
-          value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
-        />
-      </div>
-      <div>
-        password
-        <input
-          type="password"
-          value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>
+      <form onSubmit={handleLogin}>
+        <div>
+          username
+          <input
+            type="text"
+            value={username}
+            name="Username"
+            onChange={({ target }) => setUsername(target.value)}
+          />
+        </div>
+        <div>
+          password
+          <input
+            type="password"
+            value={password}
+            name="Password"
+            onChange={({ target }) => setPassword(target.value)}
+          />
+        </div>
+        <button type="submit">login</button>
+      </form>
     </>
-    
   );
 
   const handleLogout = () => {
@@ -111,14 +131,8 @@ const App = () => {
         {user.username} logged in
         <button onClick={handleLogout}>logout</button>
       </div>
-      <Togglable buttonLabel='new blog' ref={blogFormRef}>
-        <CreateBlog
-          setNewBlog={setNewBlog}
-          newBlog={newBlog}
-          setNotification={setNotification}
-          setBlogs={setBlogs}
-          blogs={blogs}
-        />
+      <Togglable buttonLabel="new blog" ref={blogFormRef}>
+        <CreateBlog setNotification={setNotification} createBlog={addBlog} />
       </Togglable>
       {blogs.map((blog) => (
         <Blog key={blog.id} blog={blog} />

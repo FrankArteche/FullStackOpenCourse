@@ -4,42 +4,16 @@ import blogService from "../services/blogs";
 import loginService from "../services/login";
 
 const CreateBlog = ({
-  setNewBlog,
-  newBlog,
   setNotification,
-  setBlogs,
-  blogs,
+  createBlog
 }) => {
+
+  const [newBlog, setNewBlog] = useState({});
+
   const handleNewBlog = async (event) => {
     event.preventDefault();
 
-    try {
-      let updatedBlogs = [...blogs.concat(newBlog)];
-
-      await blogService.create(newBlog);
-      setBlogs(updatedBlogs);
-      setNotification({
-        type: "success",
-        message: `A new Blog called ${newBlog.title} by ${newBlog.author} has been added`,
-      });
-      setTimeout(() => {
-        setNotification({
-          type: "",
-          message: "",
-        });
-      }, 5000);
-    } catch (error) {
-      setNotification({
-        type: "error",
-        message: `An error occurred:  ${error.response.data.error}`,
-      });      
-      setTimeout(() => {
-        setNotification({
-          type: "",
-          message: "",
-        });
-      }, 5000);
-    }
+    createBlog(newBlog)
   };
 
   return (
