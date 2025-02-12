@@ -28,7 +28,11 @@ const update = async (existingObject) => {
 
   const response = await axios.put(`${baseUrl}/${existingObject.id}`, existingObject, config)
 
-  return response.data;
+  const blogUser = await axios.get(`/api/users/${response.data.user}`)
+
+  const blogWithUser = {...response.data, user: blogUser.data}
+
+  return blogWithUser
 }
 
 export default { getAll, create, setToken, update }

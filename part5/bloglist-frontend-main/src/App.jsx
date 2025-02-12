@@ -81,6 +81,10 @@ const App = () => {
     }
   };
 
+  const handleLikeButton = (updatedBlog) => {
+    setBlogs(blogs.map((blog) => (blog.id === updatedBlog.id ? updatedBlog : blog)));
+  };
+
   const loginForm = () => (
     <>
       <h1>Login to application</h1>
@@ -135,7 +139,7 @@ const App = () => {
         <CreateBlog setNotification={setNotification} createBlog={addBlog} />
       </Togglable>
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} onLike={handleLikeButton} />
       ))}
     </>
   );
