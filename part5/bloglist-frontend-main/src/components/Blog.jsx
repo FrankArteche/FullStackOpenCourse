@@ -1,7 +1,12 @@
 import { useState } from "react";
+import blogService from "../services/blogs";
 
 const Blog = ({ blog }) => {
   const [viewDetails, setViewDetails] = useState(false);
+
+  const handleLikeButton = () => {
+    blogService.update({...blog, likes: (blog.likes + 1) })
+  } 
 
   const blogStyle = {
     paddingTop: 10,
@@ -19,7 +24,8 @@ const Blog = ({ blog }) => {
           {viewDetails && (
             <div style={{ display: "grid" }}>
               <div>{blog.url}</div>
-              <div>likes {blog.likes} <button>like</button></div>
+              <div>likes {blog.likes} <button onClick={handleLikeButton}>like</button></div>
+              <div>{blog.user.name}</div>
             </div>
           )}
         </div>
