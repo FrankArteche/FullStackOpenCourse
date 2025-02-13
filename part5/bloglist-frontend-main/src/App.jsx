@@ -67,7 +67,7 @@ const App = () => {
       }, 5000);
     } catch (error) {
       console.log(error);
-      
+
       setNotification({
         type: "error",
         message: `An error occurred:  ${error.response.data.error}`,
@@ -82,7 +82,9 @@ const App = () => {
   };
 
   const handleLikeButton = (updatedBlog) => {
-    setBlogs(blogs.map((blog) => (blog.id === updatedBlog.id ? updatedBlog : blog)));
+    setBlogs(
+      blogs.map((blog) => (blog.id === updatedBlog.id ? updatedBlog : blog))
+    );
   };
 
   const loginForm = () => (
@@ -122,7 +124,7 @@ const App = () => {
       type: "error",
       message: `An error occurred:  ${error.response.data.error}`,
     });
-  }
+  };
 
   const handleLogout = () => {
     window.localStorage.removeItem("loggedUser");
@@ -145,9 +147,24 @@ const App = () => {
       <Togglable buttonLabel="new blog" ref={blogFormRef}>
         <CreateBlog setNotification={setNotification} createBlog={addBlog} />
       </Togglable>
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} onLike={handleLikeButton} onError={handleError} />
-      ))}
+      {blogs
+        .sort((a, b) => {
+          if (a.likes < b.likes) {
+            return 1;
+          }
+          if (a.likes > b.likes) {
+            return -1;
+          }
+          return 0;
+        })
+        .map((blog) => (
+          <Blog
+            key={blog.id}
+            blog={blog}
+            onLike={handleLikeButton}
+            onError={handleError}
+          />
+        ))}
     </>
   );
 
