@@ -117,6 +117,13 @@ const App = () => {
     </>
   );
 
+  const handleError = (error) => {
+    setNotification({
+      type: "error",
+      message: `An error occurred:  ${error.response.data.error}`,
+    });
+  }
+
   const handleLogout = () => {
     window.localStorage.removeItem("loggedUser");
     window.location.reload();
@@ -139,7 +146,7 @@ const App = () => {
         <CreateBlog setNotification={setNotification} createBlog={addBlog} />
       </Togglable>
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} onLike={handleLikeButton} />
+        <Blog key={blog.id} blog={blog} onLike={handleLikeButton} onError={handleError} />
       ))}
     </>
   );

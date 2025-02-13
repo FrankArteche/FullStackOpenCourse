@@ -1,7 +1,7 @@
 import { useState } from "react";
 import blogService from "../services/blogs";
 
-const Blog = ({ blog, onLike }) => {
+const Blog = ({ blog, onLike, onError }) => {
   const [viewDetails, setViewDetails] = useState(false);
 
   const handleLikeButton = () => {
@@ -9,9 +9,8 @@ const Blog = ({ blog, onLike }) => {
       .update({ ...blog, likes: blog.likes + 1 })
       .then((updatedBlog) => {
         console.log('Blog actualizado:', updatedBlog);
-
         onLike(updatedBlog);
-      });
+      }).catch((error) => onError(error))
   };
 
   const blogStyle = {
