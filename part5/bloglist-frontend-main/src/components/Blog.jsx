@@ -1,17 +1,18 @@
 import { useState } from "react";
 import blogService from "../services/blogs";
 
-const Blog = ({ blog, onLike, onError }) => {
+const Blog = ({ blog, onLike, onError, canDelete }) => {
   const [viewDetails, setViewDetails] = useState(false);
 
   const handleLikeButton = () => {
     blogService
       .update({ ...blog, likes: blog.likes + 1 })
       .then((updatedBlog) => {
-        console.log('Blog actualizado:', updatedBlog);
+        console.log("Blog actualizado:", updatedBlog);
         onLike(updatedBlog);
-      }).catch((error) => onError(error))
-  };
+      })
+      .catch((error) => onError(error));
+  };  
 
   const blogStyle = {
     paddingTop: 10,
@@ -34,6 +35,11 @@ const Blog = ({ blog, onLike, onError }) => {
                 <button onClick={handleLikeButton}>like</button>
               </div>
               <div>{blog.user.name}</div>
+              {canDelete && (
+                <button style={{ background: "#7b7bff", borderRadius: "5px" }}>
+                  Remove
+                </button>
+              )}
             </div>
           )}
         </div>

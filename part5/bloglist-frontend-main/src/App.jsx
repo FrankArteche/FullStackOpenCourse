@@ -13,7 +13,7 @@ const App = () => {
   const [notification, setNotification] = useState({
     type: "",
     message: "",
-  });
+  });  
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -129,7 +129,7 @@ const App = () => {
   const handleLogout = () => {
     window.localStorage.removeItem("loggedUser");
     window.location.reload();
-  };
+  };  
 
   const blogsRenderer = () => (
     <>
@@ -145,7 +145,7 @@ const App = () => {
         <button onClick={handleLogout}>logout</button>
       </div>
       <Togglable buttonLabel="new blog" ref={blogFormRef}>
-        <CreateBlog setNotification={setNotification} createBlog={addBlog} />
+        <CreateBlog setNotification={setNotification} createBlog={addBlog}/>
       </Togglable>
       {blogs
         .sort((a, b) => {
@@ -157,14 +157,22 @@ const App = () => {
           }
           return 0;
         })
-        .map((blog) => (
+        .map((blog) => {
+          let isSameCreator = blog.user.username == user.username
+
+          
+          return (
           <Blog
             key={blog.id}
             blog={blog}
             onLike={handleLikeButton}
             onError={handleError}
+            canDelete={isSameCreator}
           />
-        ))}
+        )
+        }
+      )
+        }
     </>
   );
 
