@@ -1,7 +1,7 @@
 import { useState } from "react";
 import blogService from "../services/blogs";
 
-const Blog = ({ blog, onLike, onError, canDelete }) => {
+const Blog = ({ blog, onLike, onError, canDelete, onDelete }) => {
   const [viewDetails, setViewDetails] = useState(false);
 
   const handleLikeButton = () => {
@@ -13,6 +13,12 @@ const Blog = ({ blog, onLike, onError, canDelete }) => {
       })
       .catch((error) => onError(error));
   };  
+
+  const handleDelete = () => {
+    if (window.confirm(`Remove blog '${blog.title}' by ${blog.author}?`)) {
+      blogService.deleteBlog(blog)
+    } 
+  }
 
   const blogStyle = {
     paddingTop: 10,
@@ -36,7 +42,7 @@ const Blog = ({ blog, onLike, onError, canDelete }) => {
               </div>
               <div>{blog.user.name}</div>
               {canDelete && (
-                <button style={{ background: "#7b7bff", borderRadius: "5px" }}>
+                <button onClick={handleDelete} style={{ background: "#7b7bff", borderRadius: "5px" }}>
                   Remove
                 </button>
               )}
