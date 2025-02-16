@@ -1,7 +1,8 @@
 import { useState } from "react";
 import blogService from "../services/blogs";
+import PropTypes from 'prop-types'
 
-const Blog = ({ blog, onLike, onError, canDelete, onDelete }) => {
+const Blog = ({ blog, onLike, onError, canDelete }) => {
   const [viewDetails, setViewDetails] = useState(false);
 
   const handleLikeButton = () => {
@@ -59,4 +60,10 @@ const Blog = ({ blog, onLike, onError, canDelete, onDelete }) => {
   );
 };
 
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired,
+  onLike: PropTypes.func.isRequired,
+  onError: PropTypes.func.isRequired,
+  canDelete: PropTypes.bool.isRequired,
+}
 export default Blog;
