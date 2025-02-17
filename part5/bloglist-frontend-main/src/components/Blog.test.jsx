@@ -70,3 +70,39 @@ test("URL and likes are not shown until button has been clicked", async () => {
   expect(likes).toBeDefined();
   expect(url).toBeDefined();
 });
+
+test("like button receives two calls", async () => {
+    const blog = {
+      title: "Testing is kinda a pain in the a**",
+      author: "A man named Jerry",
+      url: "mockupurl.com",
+      likes: 1,
+      user: {
+          name: "Frank"
+      }
+    };
+  
+    const mockHandler = vi.fn();
+  
+    const {container} = render(
+      <Blog
+        blog={blog}
+        onLike={mockHandler}
+        onError={mockHandler}
+        canDelete={false}
+      />
+    );
+  
+    const user = userEvent.setup();
+
+    const viewButton = screen.getByText("view");
+    await user.click(viewButton);
+
+    const likeButton = container.querySelector('.likeButton')
+    screen.debug(likeButton)
+    await user.click(likeButton);
+    await user.click(likeButton);
+  
+    expect(mockHandler.mock.calls).toHaveLength(2)
+});
+  

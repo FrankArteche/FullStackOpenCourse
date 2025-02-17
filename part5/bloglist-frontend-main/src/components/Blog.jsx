@@ -39,7 +39,7 @@ const Blog = ({ blog, onLike, onError, canDelete }) => {
               <div>{blog.url}</div>
               <div>
                 likes {blog.likes}{" "}
-                <button onClick={handleLikeButton}>like</button>
+                <button className="likeButton" onClick={handleLikeButton}>like</button>
               </div>
               <div>{blog.user.name}</div>
               {canDelete && (
