@@ -99,7 +99,7 @@ test("like button receives two calls", async () => {
     await user.click(viewButton);
 
     const likeButton = container.querySelector('.likeButton')
-    screen.debug(likeButton)
+    
     await user.click(likeButton);
     await user.click(likeButton);
   

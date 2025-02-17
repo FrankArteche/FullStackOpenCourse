@@ -19,7 +19,7 @@ const CreateBlog = ({
   return (
     <div>
       <h2>Create new</h2>
-      <form onSubmit={handleNewBlog}>
+      <form className="form" onSubmit={handleNewBlog}>
         <div>
           Title:
           <input
@@ -53,7 +53,7 @@ const CreateBlog = ({
             }
           />
         </div>
-        <button type="submit">Create</button>
+        <button className="submitButton" type="submit">Create</button>
       </form>
     </div>
   );
