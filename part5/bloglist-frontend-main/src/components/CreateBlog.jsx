@@ -3,17 +3,13 @@ import Blog from "./Blog";
 import blogService from "../services/blogs";
 import loginService from "../services/login";
 
-const CreateBlog = ({
-  setNotification,
-  createBlog
-}) => {
-
+const CreateBlog = ({ setNotification, createBlog }) => {
   const [newBlog, setNewBlog] = useState({});
 
   const handleNewBlog = async (event) => {
     event.preventDefault();
 
-    createBlog(newBlog)
+    createBlog(newBlog);
   };
 
   return (
@@ -23,6 +19,7 @@ const CreateBlog = ({
         <div>
           Title:
           <input
+            data-testid="title"
             type="text"
             value={newBlog.title}
             name="Title"
@@ -34,6 +31,7 @@ const CreateBlog = ({
         <div>
           Author
           <input
+            data-testid="author"
             type="text"
             value={newBlog.author}
             name="Author"
@@ -45,6 +43,7 @@ const CreateBlog = ({
         <div>
           URL
           <input
+            data-testid="url"
             type="text"
             value={newBlog.url}
             name="url"
@@ -53,7 +52,9 @@ const CreateBlog = ({
             }
           />
         </div>
-        <button className="submitButton" type="submit">Create</button>
+        <button className="submitButton" type="submit">
+          Create
+        </button>
       </form>
     </div>
   );

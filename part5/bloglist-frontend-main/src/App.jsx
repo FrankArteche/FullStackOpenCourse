@@ -13,7 +13,7 @@ const App = () => {
   const [notification, setNotification] = useState({
     type: "",
     message: "",
-  });  
+  });
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -53,7 +53,7 @@ const App = () => {
 
     try {
       await blogService.create(blogObject).then((response) => {
-        setBlogs(blogs.concat(response));
+        setBlogs((prevBlogs) => prevBlogs.concat(response));
       });
       setNotification({
         type: "success",
@@ -99,6 +99,7 @@ const App = () => {
         <div>
           username
           <input
+            data-testid="username"
             type="text"
             value={username}
             name="Username"
@@ -108,6 +109,7 @@ const App = () => {
         <div>
           password
           <input
+            data-testid="password"
             type="password"
             value={password}
             name="Password"
@@ -129,7 +131,7 @@ const App = () => {
   const handleLogout = () => {
     window.localStorage.removeItem("loggedUser");
     window.location.reload();
-  };  
+  };
 
   const blogsRenderer = () => (
     <>
@@ -145,34 +147,19 @@ const App = () => {
         <button onClick={handleLogout}>logout</button>
       </div>
       <Togglable buttonLabel="new blog" ref={blogFormRef}>
-        <CreateBlog setNotification={setNotification} createBlog={addBlog}/>
+        <CreateBlog setNotification={setNotification} createBlog={addBlog} />
       </Togglable>
-      {blogs
-        .sort((a, b) => {
-          if (a.likes < b.likes) {
-            return 1;
-          }
-          if (a.likes > b.likes) {
-            return -1;
-          }
-          return 0;
-        })
-        .map((blog) => {
-          let isSameCreator = blog.user.username == user.username
-
-          
-          return (
+      {[...blogs]
+        .sort((a, b) => b.likes - a.likes)
+        .map((blog) => (
           <Blog
             key={blog.id}
             blog={blog}
             onLike={handleLikeButton}
             onError={handleError}
-            canDelete={isSameCreator}
+            user={user}
           />
-        )
-        }
-      )
-        }
+        ))}
     </>
   );
 

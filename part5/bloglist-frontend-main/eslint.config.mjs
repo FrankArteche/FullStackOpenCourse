@@ -8,7 +8,7 @@ export default [
     languageOptions: { sourceType: "commonjs" }
   },
   { 
-    ignores: ["dist/**"],
+    ignores: ["dist/**","tests"],
   },
   { languageOptions: { globals: globals.browser } },
   pluginJs.configs.recommended,

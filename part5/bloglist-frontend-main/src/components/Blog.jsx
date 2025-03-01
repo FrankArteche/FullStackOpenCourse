@@ -1,8 +1,8 @@
 import { useState } from "react";
 import blogService from "../services/blogs";
-import PropTypes from 'prop-types'
+import PropTypes from "prop-types";
 
-const Blog = ({ blog, onLike, onError, canDelete }) => {
+const Blog = ({ blog, onLike, onError, user }) => {
   const [viewDetails, setViewDetails] = useState(false);
 
   const handleLikeButton = () => {
@@ -13,13 +13,22 @@ const Blog = ({ blog, onLike, onError, canDelete }) => {
         onLike(updatedBlog);
       })
       .catch((error) => onError(error));
-  };  
+  };
 
   const handleDelete = () => {
     if (window.confirm(`Remove blog '${blog.title}' by ${blog.author}?`)) {
-      blogService.deleteBlog(blog)
-    } 
-  }
+      setIsDeleted(true);
+      try {
+        blogService.deleteBlog(blog);
+      } catch {
+        setIsDeleted(false);
+      }
+    }
+  };
+
+  const [isDeleted, setIsDeleted] = useState(false);
+
+  const canDelete = blog.user.id === user.id || blog.user === user.id;
 
   const blogStyle = {
     paddingTop: 10,
@@ -29,41 +38,48 @@ const Blog = ({ blog, onLike, onError, canDelete }) => {
     marginBottom: 5,
   };
 
-  return (
-    <div style={blogStyle}>
-      <div>
-        {blog.title} {blog.author}
-        <div style={{ display: "flex" }}>
-          {viewDetails && (
-            <div style={{ display: "grid" }}>
-              <div>{blog.url}</div>
-              <div>
-                likes {blog.likes}{" "}
-                <button className="likeButton" onClick={handleLikeButton}>like</button>
+  if (!isDeleted) {
+    return (
+      <div style={blogStyle} data-testid="blogCard">
+        <div>
+          {blog.title} {blog.author}
+          <div style={{ display: "flex" }}>
+            {viewDetails && (
+              <div style={{ display: "grid" }}>
+                <div>{blog.url}</div>
+                <div>
+                  likes {blog.likes}{" "}
+                  <button className="likeButton" onClick={handleLikeButton}>
+                    like
+                  </button>
+                </div>
+                <div>{blog.user.name}</div>
+                {canDelete && (
+                  <button
+                    onClick={handleDelete}
+                    style={{ background: "#7b7bff", borderRadius: "5px" }}
+                  >
+                    Remove
+                  </button>
+                )}
               </div>
-              <div>{blog.user.name}</div>
-              {canDelete && (
-                <button onClick={handleDelete} style={{ background: "#7b7bff", borderRadius: "5px" }}>
-                  Remove
-                </button>
-              )}
-            </div>
-          )}
+            )}
+          </div>
+        </div>
+        <div>
+          <button onClick={() => setViewDetails(!viewDetails)}>
+            {viewDetails ? "hide" : "view"}
+          </button>
         </div>
       </div>
-      <div>
-        <button onClick={() => setViewDetails(!viewDetails)}>
-          {viewDetails ? "hide" : "view"}
-        </button>
-      </div>
-    </div>
-  );
+    );
+  }
 };
 
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
   onLike: PropTypes.func.isRequired,
   onError: PropTypes.func.isRequired,
-  canDelete: PropTypes.bool.isRequired,
-}
+  user: PropTypes.object.isRequired,
+};
 export default Blog;
