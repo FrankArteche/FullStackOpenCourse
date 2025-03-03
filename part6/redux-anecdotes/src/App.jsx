@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux'
 
 const App = () => {
-  const anecdotes = useSelector(state => state)
+  const anecdotes = useSelector(state => state.sort((a, b) => b.votes - a.votes))
   const dispatch = useDispatch()
 
   const vote = (id) => {
@@ -15,10 +15,12 @@ const App = () => {
     dispatch({ type: 'NEW_ANECDOTE', payload: {content} })
   }
 
+  console.log(anecdotes);
+  
   return (
     <div>
       <h2>Anecdotes</h2>
-      {anecdotes.map(anecdote =>
+      {[...anecdotes].map(anecdote =>
         <div key={anecdote.id}>
           <div>
             {anecdote.content}
