@@ -1,4 +1,5 @@
 import { createSlice, current } from '@reduxjs/toolkit'
+import anecdoteService from '../services/anecdotes'
 
 const anecdotesAtStart = [
   "If it hurts, do it more often",
@@ -25,22 +26,15 @@ const anecdoteSlice = createSlice({
   name: "anecdotes",
   initialState: [],
   reducers: {
-    createAnecdote(state, action) {
-      const newAnecdote = {
-        content: action.payload.content,
-        id: getId(),
-        votes: 0,
-      };
-      state.push(newAnecdote);
-    },
     voteAnecdote(state, action) {
-      console.log(current(state))
-
       const id = action.payload.id;
       const anecdoteToChange = state.find((n) => n.id === id);
       console.log(anecdoteToChange)
 
       anecdoteToChange.votes++;
+    },
+    appendAnecdote(state, action) {
+      state.push(action.payload);
     },
     setAnecdotes(state,action){
       return action.payload
@@ -48,5 +42,33 @@ const anecdoteSlice = createSlice({
   }
 })
 
-export const { createAnecdote, voteAnecdote, setAnecdotes } = anecdoteSlice.actions 
+export const { voteAnecdote, setAnecdotes, appendAnecdote } = anecdoteSlice.actions 
+
+export const initializeAnecdotes = () => {
+  return async (dispatch) => {
+    const anecdotes = await anecdoteService.getAll()
+    dispatch(setAnecdotes(anecdotes))
+  }
+}
+
+export const createAnecdote = (content) => {
+  return async (dispatch) => {
+    const newAnecdote = await anecdoteService.createNew(content)
+    dispatch(appendAnecdote(newAnecdote))
+  }
+}
+
+export const sumVoteToAnecdote = (id) => {
+  return async (dispatch,getState) => {
+    const anecdotes = getState().anecdotes
+    const anecdoteToChange = anecdotes.find((n) => n.id === id);    
+    if (Number.isNaN(anecdoteToChange.votes)) {
+      anecdoteToChange.votes = 0
+    }
+    const changedAnecdote = { ...anecdoteToChange, votes: anecdoteToChange.votes + 1 };
+    const response = await anecdoteService.update(changedAnecdote);
+    dispatch(voteAnecdote(response));
+  }
+}
+
 export default anecdoteSlice.reducer;
