@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getAnecdotes, createAnecdote, updateAnecdote } from "./requests";
+import { getAnecdotes, updateAnecdote } from "./requests";
 import AnecdoteForm from "./components/AnecdoteForm";
 import Notification from "./components/Notification";
 
@@ -9,12 +9,12 @@ const App = () => {
   const updateAnecdoteMutation = useMutation({
     mutationFn: updateAnecdote,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["anecdote"] });
+      queryClient.invalidateQueries({ queryKey: ["anecdotes"] });
     },
   });
 
   const handleVote = (anecdote) => {
-    console.log("vote");
+    updateAnecdoteMutation.mutate({...anecdote, votes: anecdote.votes + 1 })
   };
 
   const result = useQuery({
