@@ -101,6 +101,8 @@ const CreateNew = (props) => {
   const [content, setContent] = useState("");
   const [author, setAuthor] = useState("");
   const [info, setInfo] = useState("");
+  const navigate = useNavigate()
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -110,6 +112,8 @@ const CreateNew = (props) => {
       info,
       votes: 0,
     });
+    navigate('/')
+
   };
 
   return (
@@ -147,6 +151,7 @@ const CreateNew = (props) => {
 };
 
 const App = () => {
+
   const [anecdotes, setAnecdotes] = useState([
     {
       content: "If it hurts, do it more often",
@@ -169,6 +174,10 @@ const App = () => {
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000);
     setAnecdotes(anecdotes.concat(anecdote));
+    setNotification(`a new anecdote ${anecdote.content} created!`);
+    setTimeout(() => {
+      setNotification("");
+    }, 5000);
   };
 
   const vote = (id) => {
@@ -187,6 +196,7 @@ const App = () => {
       <Router>
         <h1>Software anecdotes</h1>
         <Menu />
+        {notification}
         <Routes>
           <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
           <Route path="/about" element={<About />} />
