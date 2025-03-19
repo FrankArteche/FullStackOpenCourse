@@ -8,6 +8,7 @@ import {
   useParams,
   useNavigate,
 } from "react-router-dom";
+import { useField } from "./hooks";
 
 const Menu = () => {
   const padding = {
@@ -33,21 +34,23 @@ const AnecdoteList = ({ anecdotes }) => (
     <h2>Anecdotes</h2>
     <ul>
       {anecdotes.map((anecdote) => (
-        <Link key={anecdote.id} to={`/anecdotes/${anecdote.id}`}>
-          <li>{anecdote.content}</li>
-        </Link>
+        <li key={anecdote.id}>
+          <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
+        </li>
       ))}
     </ul>
   </div>
 );
 
 const Anecdote = ({ anecdotes }) => {
-
   const id = useParams().id;
+
+  if (!anecdotes || anecdotes.length === 0) {
+    return <div>Loading anecdotes...</div>;
+  }
 
   const anecdoteById = (id) => anecdotes.find((a) => a.id === Number(id));
   console.log(anecdoteById(id));
-  
 
   const anecdote = anecdoteById(id);
 
@@ -98,22 +101,27 @@ const Footer = () => (
 );
 
 const CreateNew = (props) => {
-  const [content, setContent] = useState("");
-  const [author, setAuthor] = useState("");
-  const [info, setInfo] = useState("");
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
+  const content = useField("text");
+  const author = useField("text");
+  const info = useField("text");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     props.addNew({
-      content,
-      author,
-      info,
+      content: content.inputProps.value,
+      author: author.inputProps.value,
+      info: info.inputProps.value,
       votes: 0,
     });
-    navigate('/')
+    navigate("/");
+  };
 
+  const handleReset = () => {
+    content.reset();
+    author.reset();
+    info.reset();
   };
 
   return (
@@ -122,36 +130,24 @@ const CreateNew = (props) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input
-            name="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-          />
+          <input {...content.inputProps} />
         </div>
         <div>
           author
-          <input
-            name="author"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-          />
+          <input {...author.inputProps} />
         </div>
         <div>
           url for more info
-          <input
-            name="info"
-            value={info}
-            onChange={(e) => setInfo(e.target.value)}
-          />
+          <input {...info.inputProps} />
         </div>
-        <button>create</button>
+        <button type="submit">create</button>
+        <button type="button" onClick={handleReset}>reset</button>
       </form>
     </div>
   );
 };
 
 const App = () => {
-
   const [anecdotes, setAnecdotes] = useState([
     {
       content: "If it hurts, do it more often",
