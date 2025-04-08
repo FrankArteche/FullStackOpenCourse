@@ -8,6 +8,7 @@ import { initializeBlogs } from "./reducers/blogReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { notificationChange } from "./reducers/notificationReducer";
 import { createBlog, likeBlog } from "./reducers/blogReducer";
+import { setUser as setUserRedux, logoutUser } from "./reducers/userReducer";
 
 const App = () => {
   const blogs = useSelector((state) => state.blogs);
@@ -20,8 +21,6 @@ const App = () => {
   //   type: "",
   //   message: "",
   // });
-
-  console.log(user);
 
   const notification = useSelector((state) => state.notifications);
 
@@ -42,6 +41,7 @@ const App = () => {
       window.localStorage.setItem("loggedUser", JSON.stringify(user));
       blogService.setToken(user.token);
       setUser(user);
+      dispatch(setUserRedux(user));
       setUsername("");
       setPassword("");
     } catch (error) {
@@ -158,6 +158,7 @@ const App = () => {
   const handleLogout = () => {
     window.localStorage.removeItem("loggedUser");
     window.location.reload();
+    dispatch(logoutUser());
   };
 
   const blogsRenderer = () => (
@@ -197,6 +198,7 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
       setUser(user);
+      dispatch(setUserRedux(user));
       blogService.setToken(user.token);
     }
   }, []);
