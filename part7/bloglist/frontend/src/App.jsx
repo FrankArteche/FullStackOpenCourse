@@ -4,19 +4,27 @@ import blogService from "./services/blogs";
 import loginService from "./services/login";
 import CreateBlog from "./components/CreateBlog";
 import Togglable from "./components/Toggable";
+import { initializeBlogs } from "./reducers/blogReducer";
+import { useDispatch, useSelector } from "react-redux";
+import { notificationChange } from "./reducers/notificationReducer";
+import { createBlog } from "./reducers/blogReducer";
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
+  const blogs = useSelector((state) => state.blogs);
+  const dispatch = useDispatch();
+
   const [user, setUser] = useState(null);
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
-  const [notification, setNotification] = useState({
-    type: "",
-    message: "",
-  });
+  // const [notification, setNotification] = useState({
+  //   type: "",
+  //   message: "",
+  // });
+
+  const notification = useSelector((state) => state.notifications);
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
+    dispatch(initializeBlogs());
   }, []);
 
   const blogFormRef = useRef();
@@ -35,15 +43,19 @@ const App = () => {
       setUsername("");
       setPassword("");
     } catch (error) {
-      setNotification({
-        type: "error",
-        message: `An error occurred:  ${error.response.data.error}`,
-      });
+      dispatch(
+        notificationChange({
+          type: "error",
+          message: `An error occurred:  ${error.response.data.error}`,
+        }),
+      );
       setTimeout(() => {
-        setNotification({
-          type: "",
-          message: "",
-        });
+        dispatch(
+          notificationChange({
+            type: "",
+            message: "",
+          }),
+        );
       }, 5000);
     }
   };
@@ -53,30 +65,38 @@ const App = () => {
 
     try {
       await blogService.create(blogObject).then((response) => {
-        setBlogs((prevBlogs) => prevBlogs.concat(response));
+        dispatch(createBlog(response));
+        // setBlogs((prevBlogs) => prevBlogs.concat(response));
       });
-      setNotification({
-        type: "success",
-        message: `A new Blog called ${blogObject.title} by ${blogObject.author} has been added`,
-      });
+      dispatch(
+        notificationChange({
+          type: "success",
+          message: `A new Blog called ${blogObject.title} by ${blogObject.author} has been added`,
+        }),
+      );
       setTimeout(() => {
-        setNotification({
-          type: "",
-          message: "",
-        });
+        dispatch(
+          notificationChange({
+            type: "",
+            message: "",
+          }),
+        );
       }, 5000);
     } catch (error) {
       console.log(error);
-
-      setNotification({
-        type: "error",
-        message: `An error occurred:  ${error.response.data.error}`,
-      });
+      dispatch(
+        notificationChange({
+          type: "error",
+          message: `An error occurred:  ${error.response.data.error}`,
+        }),
+      );
       setTimeout(() => {
-        setNotification({
-          type: "",
-          message: "",
-        });
+        dispatch(
+          notificationChange({
+            type: "",
+            message: "",
+          }),
+        );
       }, 5000);
     }
   };
@@ -122,10 +142,12 @@ const App = () => {
   );
 
   const handleError = (error) => {
-    setNotification({
-      type: "error",
-      message: `An error occurred:  ${error.response.data.error}`,
-    });
+    dispatch(
+      notificationChange({
+        type: "error",
+        message: `An error occurred:  ${error.response.data.error}`,
+      }),
+    );
   };
 
   const handleLogout = () => {
@@ -147,7 +169,7 @@ const App = () => {
         <button onClick={handleLogout}>logout</button>
       </div>
       <Togglable buttonLabel="new blog" ref={blogFormRef}>
-        <CreateBlog setNotification={setNotification} createBlog={addBlog} />
+        <CreateBlog createBlog={addBlog} />
       </Togglable>
       {[...blogs]
         .sort((a, b) => b.likes - a.likes)

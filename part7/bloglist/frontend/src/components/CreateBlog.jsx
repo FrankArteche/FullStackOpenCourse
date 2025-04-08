@@ -3,7 +3,7 @@ import Blog from "./Blog";
 import blogService from "../services/blogs";
 import loginService from "../services/login";
 
-const CreateBlog = ({ setNotification, createBlog }) => {
+const CreateBlog = ({ createBlog }) => {
   const [newBlog, setNewBlog] = useState({});
 
   const handleNewBlog = async (event) => {
