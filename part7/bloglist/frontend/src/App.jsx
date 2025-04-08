@@ -7,7 +7,7 @@ import Togglable from "./components/Toggable";
 import { initializeBlogs } from "./reducers/blogReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { notificationChange } from "./reducers/notificationReducer";
-import { createBlog } from "./reducers/blogReducer";
+import { createBlog, likeBlog } from "./reducers/blogReducer";
 
 const App = () => {
   const blogs = useSelector((state) => state.blogs);
@@ -20,6 +20,8 @@ const App = () => {
   //   type: "",
   //   message: "",
   // });
+
+  console.log(user);
 
   const notification = useSelector((state) => state.notifications);
 
@@ -102,9 +104,10 @@ const App = () => {
   };
 
   const handleLikeButton = (updatedBlog) => {
-    setBlogs(
-      blogs.map((blog) => (blog.id === updatedBlog.id ? updatedBlog : blog)),
-    );
+    dispatch(likeBlog(updatedBlog.id));
+    // setBlogs(
+    //   blogs.map((blog) => (blog.id === updatedBlog.id ? updatedBlog : blog)),
+    // );
   };
 
   const loginForm = () => (
@@ -142,6 +145,8 @@ const App = () => {
   );
 
   const handleError = (error) => {
+    console.log(error);
+
     dispatch(
       notificationChange({
         type: "error",
@@ -173,15 +178,17 @@ const App = () => {
       </Togglable>
       {[...blogs]
         .sort((a, b) => b.likes - a.likes)
-        .map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            onLike={handleLikeButton}
-            onError={handleError}
-            user={user}
-          />
-        ))}
+        .map((blog) => {
+          return (
+            <Blog
+              key={blog.id}
+              blog={blog}
+              onLike={handleLikeButton}
+              onError={handleError}
+              user={user}
+            />
+          );
+        })}
     </>
   );
 

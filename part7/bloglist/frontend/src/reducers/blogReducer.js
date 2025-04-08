@@ -18,16 +18,13 @@ const blogSlice = createSlice({
   name: "blogs",
   initialState: [],
   reducers: {
-    toggleImportanceOf(state, action) {
+    likeBlog(state, action) {
       const id = action.payload;
       const blogToChange = state.find((n) => n.id === id);
       const changedBlog = {
         ...blogToChange,
-        important: !blogToChange.important,
+        likes: blogToChange.likes + 1,
       };
-
-      console.log(state);
-
       return state.map((blog) => (blog.id !== id ? blog : changedBlog));
     },
     appendBlog(state, action) {
@@ -39,7 +36,7 @@ const blogSlice = createSlice({
   },
 });
 
-export const { toggleImportanceOf, appendBlog, setBlogs } = blogSlice.actions;
+export const { likeBlog, appendBlog, setBlogs } = blogSlice.actions;
 
 export const initializeBlogs = () => {
   return async (dispatch) => {
