@@ -10,7 +10,6 @@ import { notificationChange } from "./reducers/notificationReducer";
 import { createBlog, likeBlog } from "./reducers/blogReducer";
 import { setUser as setUserRedux, logoutUser } from "./reducers/userReducer";
 import {
-  BrowserRouter as Router,
   Routes,
   Route,
   Link,
@@ -18,63 +17,9 @@ import {
   useParams,
   useNavigate,
 } from "react-router-dom";
-import axios from "axios";
-
-const Users = () => {
-  const [users, setUsers] = useState([]);
-
-  const getUsers = () => {
-    axios.get("/api/users").then((response) => {
-      setUsers(response.data);
-    });
-  };
-  useEffect(() => {
-    getUsers();
-  }, []);
-  return (
-    <>
-      <h2>Users</h2>
-      <div>
-        Blogs created
-        {users.map((user) => {
-          console.log(user);
-
-          return (
-            <div key={user.id}>
-              <Link to={`/users/${user.id}`}>{user.name}</Link>
-              <p>{user.blogs.length}</p>
-            </div>
-          );
-        })}
-      </div>
-    </>
-  );
-};
-
-const SingleUser = () => {
-  const { id } = useParams();
-  const [user, setUser] = useState({ name: "", blogs: [] });
-
-  const getUser = () => {
-    axios.get(`/api/users/${id}`).then((response) => {
-      setUser(response.data);
-    });
-  };
-  useEffect(() => {
-    getUser();
-  }, []);
-  return (
-    <>
-      <h2>{user.name}</h2>
-      <h3>added blogs</h3>
-      <ul>
-        {user.blogs.map((blog) => {
-          return <li key={blog.id}>{blog.title}</li>;
-        })}
-      </ul>
-    </>
-  );
-};
+import Users from "./components/Users";
+import SingleUser from "./components/SingleUser";
+import SingleBlog from "./components/SingleBlog";
 
 const App = () => {
   const blogs = useSelector((state) => state.blogs);
@@ -269,18 +214,25 @@ const App = () => {
 
       {user && (
         <div>
+          <div>
+            {" "}
+            <Link to="/">blogs</Link>
+          </div>
+          <div>
+            {" "}
+            <Link to="/users">users</Link>
+          </div>
           {user?.username} logged in
           <button onClick={handleLogout}>logout</button>
         </div>
       )}
       {!user && loginForm()}
-      <Router>
-        <Routes>
-          <Route path="/" element={blogsRenderer()} />
-          <Route path="/users" element={<Users />} />
-          <Route path="/users/:id" element={<SingleUser />} />
-        </Routes>
-      </Router>
+      <Routes>
+        <Route path="/" element={blogsRenderer()} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/users/:id" element={<SingleUser />} />
+        <Route path="/blogs/:id" element={<SingleBlog />} />
+      </Routes>
       {/* {user === null ? loginForm() : blogsRenderer()} */}
     </div>
   );
