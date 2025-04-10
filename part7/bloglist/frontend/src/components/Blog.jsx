@@ -29,7 +29,7 @@ const Blog = ({ blog, onLike, onError, user }) => {
   const [isDeleted, setIsDeleted] = useState(false);
 
   const canDelete =
-    blog.user.username === user.username || blog.user === user.id;
+    blog.user.username === user?.username || blog.user === user?.id;
 
   const blogStyle = {
     paddingTop: 10,

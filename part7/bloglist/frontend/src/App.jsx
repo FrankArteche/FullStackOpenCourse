@@ -9,6 +9,72 @@ import { useDispatch, useSelector } from "react-redux";
 import { notificationChange } from "./reducers/notificationReducer";
 import { createBlog, likeBlog } from "./reducers/blogReducer";
 import { setUser as setUserRedux, logoutUser } from "./reducers/userReducer";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  Navigate,
+  useParams,
+  useNavigate,
+} from "react-router-dom";
+import axios from "axios";
+
+const Users = () => {
+  const [users, setUsers] = useState([]);
+
+  const getUsers = () => {
+    axios.get("/api/users").then((response) => {
+      setUsers(response.data);
+    });
+  };
+  useEffect(() => {
+    getUsers();
+  }, []);
+  return (
+    <>
+      <h2>Users</h2>
+      <div>
+        Blogs created
+        {users.map((user) => {
+          console.log(user);
+
+          return (
+            <div key={user.id}>
+              <Link to={`/users/${user.id}`}>{user.name}</Link>
+              <p>{user.blogs.length}</p>
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+};
+
+const SingleUser = () => {
+  const { id } = useParams();
+  const [user, setUser] = useState({ name: "", blogs: [] });
+
+  const getUser = () => {
+    axios.get(`/api/users/${id}`).then((response) => {
+      setUser(response.data);
+    });
+  };
+  useEffect(() => {
+    getUser();
+  }, []);
+  return (
+    <>
+      <h2>{user.name}</h2>
+      <h3>added blogs</h3>
+      <ul>
+        {user.blogs.map((blog) => {
+          return <li key={blog.id}>{blog.title}</li>;
+        })}
+      </ul>
+    </>
+  );
+};
 
 const App = () => {
   const blogs = useSelector((state) => state.blogs);
@@ -163,17 +229,6 @@ const App = () => {
 
   const blogsRenderer = () => (
     <>
-      <h2>blogs</h2>
-      {notification.message.length > 0 && (
-        <div className={notification.type == "success" ? "success" : "error"}>
-          {notification.message}
-        </div>
-      )}
-
-      <div>
-        {user.username} logged in
-        <button onClick={handleLogout}>logout</button>
-      </div>
       <Togglable buttonLabel="new blog" ref={blogFormRef}>
         <CreateBlog createBlog={addBlog} />
       </Togglable>
@@ -203,7 +258,32 @@ const App = () => {
     }
   }, []);
 
-  return <div>{user === null ? loginForm() : blogsRenderer()}</div>;
+  return (
+    <div>
+      <h2>blogs</h2>
+      {notification.message.length > 0 && (
+        <div className={notification.type == "success" ? "success" : "error"}>
+          {notification.message}
+        </div>
+      )}
+
+      {user && (
+        <div>
+          {user?.username} logged in
+          <button onClick={handleLogout}>logout</button>
+        </div>
+      )}
+      {!user && loginForm()}
+      <Router>
+        <Routes>
+          <Route path="/" element={blogsRenderer()} />
+          <Route path="/users" element={<Users />} />
+          <Route path="/users/:id" element={<SingleUser />} />
+        </Routes>
+      </Router>
+      {/* {user === null ? loginForm() : blogsRenderer()} */}
+    </div>
+  );
 };
 
 export default App;
